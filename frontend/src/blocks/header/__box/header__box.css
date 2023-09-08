@@ -1,0 +1,12 @@
+.header__box {
+  padding-top: 45px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+@media (max-width: 560px) {
+  .header__box {
+    padding-top: 28px;
+  }
+}

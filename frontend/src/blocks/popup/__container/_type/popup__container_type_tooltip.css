@@ -1,0 +1,13 @@
+.popup__container_type_tooltip {
+  max-width: 430px;
+  min-height: 330px;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 709px) {
+  .popup__container_type_tooltip {
+    max-width: 280px;
+    min-height: 308px;
+  }
+}

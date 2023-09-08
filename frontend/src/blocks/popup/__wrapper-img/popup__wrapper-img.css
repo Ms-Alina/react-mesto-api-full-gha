@@ -1,0 +1,6 @@
+.popup__wrapper-img {
+  max-width: 75vw;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}

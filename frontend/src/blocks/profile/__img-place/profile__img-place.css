@@ -1,0 +1,7 @@
+.profile__img-place {
+  position: relative;
+}
+
+.profile__img-place:hover .profile__change-button {
+  display: block;
+}

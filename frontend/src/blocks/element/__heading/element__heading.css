@@ -1,0 +1,10 @@
+.element__heading {
+  max-width: 188px;
+  margin: 0;
+  padding: 0;
+  font: 900 24px/1.2 'Inter', sans-serif;
+  color: #000;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}

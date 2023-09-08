@@ -1,0 +1,10 @@
+.header__user-box {
+  display: flex;
+  align-self: center;
+}
+
+@media (max-width: 560px) {
+  .header__user-box {
+    display: none;
+  }
+}

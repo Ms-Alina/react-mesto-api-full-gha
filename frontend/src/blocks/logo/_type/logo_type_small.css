@@ -1,0 +1,6 @@
+@media (max-width: 560px) {
+  .logo_type_small {
+    padding: 27px 0 31.6px 0;
+    order: 2;
+  }
+}

@@ -1,0 +1,12 @@
+@media (max-width: 560px) {
+  .header__user-box_type_small {
+    width: 100%;
+    padding-top: 0;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    order: 1;
+    box-sizing: border-box;
+    border-bottom: 1px solid #545454;
+  }
+}

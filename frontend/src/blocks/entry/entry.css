@@ -1,0 +1,13 @@
+.entry {
+  max-width: 882px;
+  min-height: calc(100vh - 263px);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 499px) {
+  .entry {
+    min-height: calc(100vh - 183px);
+  }
+}

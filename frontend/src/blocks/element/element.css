@@ -1,0 +1,16 @@
+.element {
+  min-height: 362px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+}
+
+@media (max-width: 580px) {
+  .element {
+    min-height: 361px;
+  }
+}

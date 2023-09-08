@@ -1,0 +1,29 @@
+.header__button {
+  color: #A9A9A9;
+  background-color: transparent;
+  border: none;
+
+  font: 400 18px/1.2 'Inter', sans-serif;
+  padding: 0;
+  margin: 0 0 0 24px;
+  align-self: center;
+  transition: opacity .3s ease-in;
+}
+
+.header__button:hover {
+  opacity: 0.6;
+  cursor: pointer;
+}
+
+@media (max-width: 909px) {
+  .header__button {
+    padding-right: 27px;
+  }
+}
+
+@media (max-width: 560px) {
+  .header__button {
+    /* font-size: 18px; */
+    padding-bottom: 40px;
+  }
+}

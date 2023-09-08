@@ -1,0 +1,18 @@
+.entry__link {
+  margin-top: 15px;
+  font: 400 14px/1.2 'Inter', sans-serif;
+  color: #fff;
+  text-align: center;
+  text-decoration: none;
+  position: absolute;
+  bottom: -30px;
+  left: 20%;
+}
+
+@media (max-width: 561px) {
+  .entry__link {
+    margin-top: 20px;
+    bottom: -35px;
+    left: 9%;
+  }
+}
