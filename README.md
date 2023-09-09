@@ -46,7 +46,7 @@
 
 ## Ссылки на проект
 
-IP-адрес 158.160.111.234
+IP 158.160.111.234
 
 Frontend http://mesto-gallery.students.nomoredomainsicu.ru
 
