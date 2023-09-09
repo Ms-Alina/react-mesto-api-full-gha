@@ -2,6 +2,8 @@ const allowedCors = [
   'http://127.0.0.1:3000',
   'http://mesto-gallery.students.nomoredomainsicu.ru',
   'https://mesto-gallery.students.nomoredomainsicu.ru',
+  'http://api.mesto-gallery.student.nomoredomainsicu.ru',
+  'https://api.mesto-gallery.student.nomoredomainsicu.ru',
 ];
 
 const cors = (req, res, next) => {
