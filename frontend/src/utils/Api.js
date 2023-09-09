@@ -133,9 +133,10 @@ export default class Api {
 
 // Создаем экземпляр класса Api
 export const api = new Api({
-  baseUrl: 'https://mesto.nomoreparties.co/v1/cohort-68',
+  // baseUrl: 'https://mesto.nomoreparties.co/v1/cohort-68',
+  baseUrl: 'https://api.mesto-gallery.student.nomoredomainsicu.ru',
   headers: {
-    authorization: '04191f74-b685-4000-9654-e8e43ee7e193',
+    // authorization: '04191f74-b685-4000-9654-e8e43ee7e193',
     'Content-Type': 'application/json'
   }
 });

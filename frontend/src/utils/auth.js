@@ -1,6 +1,7 @@
 import { request } from "./request";
 
-export const BASE_URL = 'https://auth.nomoreparties.co';
+// export const BASE_URL = 'https://auth.nomoreparties.co';
+export const BASE_URL = 'https://api.mesto-gallery.student.nomoredomainsicu.ru';
 
 export const register = (password, email) => {
   return request(`${BASE_URL}/signup`, {
