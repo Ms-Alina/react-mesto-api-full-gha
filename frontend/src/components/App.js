@@ -177,7 +177,7 @@ function App() {
         .then(data => {
           if(data){
             handleInfoTooltip(true);
-            history.push('/sign-in');
+            history.push('/signin');
           }
         })
         .catch(err => {
@@ -208,7 +208,7 @@ function App() {
     localStorage.removeItem('token');
     setLoggedIn(false);
     setEmail('');
-    history.push('/sign-in');
+    history.push('/signin');
   }
 
   function handleEditAvatarClick() {
@@ -274,11 +274,11 @@ function App() {
             onDeleteProve={handleDeleteProve}
           />
 
-          <Route  path="/sign-in">
+          <Route  path="/signin">
             <Login onLogin={handleLogin}/>
           </Route>
 
-          <Route  path="/sign-up">
+          <Route  path="/signup">
             <Register onRegister={handleRegister}/>
           </Route>
 
@@ -286,7 +286,7 @@ function App() {
             {loggedIn ? (
               <Redirect to="/" />
             ) : (
-              <Redirect to="/sign-in" />
+              <Redirect to="/signin" />
             )} 
           </Route>
         </Switch>

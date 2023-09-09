@@ -13,11 +13,11 @@ function Header({email, onSignOut}) {
     <header className="header">
       <div className={`header__box ${isClicked ? 'header__box_type_small' : ''}`}>
         <img className={`logo ${isClicked ? 'logo_type_small' : ''}`} src={logo} alt="Логотип Место" />
-        <Route path='/sign-in'>
-          <Link to='sign-up' className='header__link'>Регистрация</Link>
+        <Route path='/signin'>
+          <Link to='signup' className='header__link'>Регистрация</Link>
         </Route>
-        <Route path='/sign-up'>
-          <Link to='sign-in' className='header__link'>Войти</Link>
+        <Route path='/signup'>
+          <Link to='signin' className='header__link'>Войти</Link>
         </Route>
         <Route exact path='/'>
           <div className={`header__button_type_menu ${isClicked ? 'header__button_type_menu-close' : ''}`} onClick={handleClickMenu}>
