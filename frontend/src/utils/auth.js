@@ -31,13 +31,23 @@ export const login = (password, email) => {
   })
 };
 
-export const checkToken = (token) => {
+// export const checkToken = (token) => {
+//   return request(`${BASE_URL}/users/me`, {
+//     method: 'GET',
+//     headers: {
+//       'Accept': 'application/json',
+//       'Content-Type': 'application/json',
+//       'Authorization': `Bearer ${token}`,
+//     }
+//   })
+// } 
+export const checkToken = (jwt) => {
   return request(`${BASE_URL}/users/me`, {
     method: 'GET',
     headers: {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
+      'Authorization': `Bearer ${jwt}`,
     }
   })
 } 

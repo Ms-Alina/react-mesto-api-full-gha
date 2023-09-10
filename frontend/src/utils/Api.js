@@ -7,7 +7,8 @@ export default class Api {
     this._userUrl = `${this._baseUrl}/users/me`;
     this._cardsUrl = `${this._baseUrl}/cards`;
     this._likesUrl = `${this._baseUrl}/cards/likes`;
-    this._token = headers['authorization'];
+    // this._token = headers['authorization'];
+    this._headers = headers;
   }
 
   // Метод проверки ответа сервера
@@ -18,12 +19,21 @@ export default class Api {
     return Promise.reject(`Ошибка: ${res.status}`);
   }
 
+  _getHeaders() {
+    const jwt = localStorage.getItem('jwt');
+    return {
+      'Authorization': `Bearer ${jwt}`,
+      ...this._headers,
+    };
+  }
+
   // Получем информацию о пользователе с сервера
   async getUserData() {
     const res = await fetch(this._userUrl, {
-      headers: {
-        authorization: this._token,
-      }
+      // headers: {
+      //   authorization: this._token,
+      // }
+      headers: this._getHeaders(),
     });
     return this._getResponseData(res);
   }
@@ -35,10 +45,11 @@ export default class Api {
   }) {
     const res = await fetch(this._userUrl, {
       method: 'PATCH',
-      headers: {
-        authorization: this._token,
-        'Content-Type': 'application/json'
-      },
+      // headers: {
+      //   authorization: this._token,
+      //   'Content-Type': 'application/json'
+      // },
+      headers: this._getHeaders(),
       body: JSON.stringify({
         name: name,
         about: about,
@@ -51,10 +62,11 @@ export default class Api {
   async changedAvatar(src) {
     const res = await fetch(`${this._userUrl}/avatar`, {
       method: 'PATCH',
-      headers: {
-        authorization: this._token,
-        'Content-Type': 'application/json'
-      },
+      // headers: {
+      //   authorization: this._token,
+      //   'Content-Type': 'application/json'
+      // },
+      headers: this._getHeaders(),
       body: JSON.stringify({
         avatar: src,
       })
@@ -65,9 +77,10 @@ export default class Api {
   // Получаем карточеки с сервера
   async getInitialCards() {
     const res = await fetch(this._cardsUrl, {
-      headers: {
-        authorization: this._token,
-      }
+      // headers: {
+      //   authorization: this._token,
+      // }
+      headers: this._getHeaders()
     });
     return this._getResponseData(res);
   }
@@ -79,10 +92,11 @@ export default class Api {
   }) {
     const res = await fetch(this._cardsUrl, {
       method: 'POST',
-      headers: {
-        authorization: this._token,
-        'Content-Type': 'application/json'
-      },
+      // headers: {
+      //   authorization: this._token,
+      //   'Content-Type': 'application/json'
+      // },
+      headers: this._getHeaders(),
       body: JSON.stringify({
         name: name,
         link: link,
@@ -95,9 +109,10 @@ export default class Api {
   deleteCard(cardId) {
     return fetch(`${this._cardsUrl}/${cardId}`, {
         method: 'DELETE',
-        headers: {
-          authorization: this._token,
-        }
+        // headers: {
+        //   authorization: this._token,
+        // }
+        headers: this._getHeaders()
       })
       .then(res => {
         return this._getResponseData(res);
@@ -108,9 +123,10 @@ export default class Api {
   likedCard(cardId) {
     return fetch(`${this._likesUrl}/${cardId}`, {
         method: 'PUT',
-        headers: {
-          authorization: this._token,
-        }
+        // headers: {
+        //   authorization: this._token,
+        // }
+        headers: this._getHeaders()
       })
       .then(res => {
         return this._getResponseData(res);
@@ -121,9 +137,10 @@ export default class Api {
   dislikedCard(cardId) {
     return fetch(`${this._likesUrl}/${cardId}`, {
         method: 'DELETE',
-        headers: {
-          authorization: this._token,
-        }
+        // headers: {
+        //   authorization: this._token,
+        // }
+        headers: this._getHeaders()
       })
       .then(res => {
         return this._getResponseData(res);

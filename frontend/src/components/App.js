@@ -72,10 +72,26 @@ function App() {
     }
   }, [isOpen]);
 
+  // useEffect(() => {
+  //   const token = localStorage.getItem('token');
+  //   if(token){
+  //     auth.checkToken(token)
+  //       .then(data => {
+  //         if(data){
+  //           setEmail(data.data.email);
+  //           handleLoggedIn();
+  //           history.push('/');
+  //         }
+  //       })
+  //       .catch((err) => {
+  //         console.error(err);
+  //       });
+  //   }
+  // }, [history]);
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if(token){
-      auth.checkToken(token)
+    const jwt = localStorage.getItem('jwt');
+    if(jwt){
+      auth.checkToken(jwt)
         .then(data => {
           if(data){
             setEmail(data.data.email);
@@ -187,6 +203,21 @@ function App() {
     }
   
     // Обработчик авторизации
+    // function handleLogin(password, email) {
+    //   auth.login(password, email)
+    //     .then(data => {
+    //       if(data.token){
+    //         setEmail(email);
+    //         handleLoggedIn();
+    //         history.push('/');
+    //         localStorage.setItem('token', data.token);
+    //       }
+    //     })
+    //     .catch(err => {
+    //       handleInfoTooltip(false);
+    //       console.log(err);
+    //     }) 
+    // }
     function handleLogin(password, email) {
       auth.login(password, email)
         .then(data => {
@@ -194,7 +225,7 @@ function App() {
             setEmail(email);
             handleLoggedIn();
             history.push('/');
-            localStorage.setItem('token', data.token);
+            localStorage.setItem('jwt', data.token);
           }
         })
         .catch(err => {
@@ -204,8 +235,14 @@ function App() {
     }
 
   // Обработчик выхода
+  // function handleSignOut() {
+  //   localStorage.removeItem('token');
+  //   setLoggedIn(false);
+  //   setEmail('');
+  //   history.push('/signin');
+  // }
   function handleSignOut() {
-    localStorage.removeItem('token');
+    localStorage.removeItem('jwt');
     setLoggedIn(false);
     setEmail('');
     history.push('/signin');
