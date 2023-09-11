@@ -131,15 +131,13 @@ const login = (req, res, next) => {
       }
       return bcrypt.compare(password, user.password).then((matched) => {
         if (!matched) {
-          return next(
-            new ErrorCodeAuth('Неверные почта или пароль')
-          );
+          return next(new ErrorCodeAuth('Неверные почта или пароль'));
         }
         const token = jwt.sign(
           { _id: user._id },
           NODE_ENV === 'production' ? JWT_SECRET : 'yandex-praktikum',
           {
-            expiresIn: '7d',
+            expiresIn: '7d'
           }
         );
         return res.send({ token });

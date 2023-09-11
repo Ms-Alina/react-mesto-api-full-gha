@@ -99,6 +99,7 @@ function App() {
   //       });
   //   }
   // }, [history]);
+  //
 
   useEffect(() => {
     const jwt = localStorage.getItem('jwt');
