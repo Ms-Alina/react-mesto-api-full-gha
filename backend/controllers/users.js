@@ -1,10 +1,13 @@
-const { JWT_SECRET, NODE_ENV } = process.env;
+require('dotenv').config();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const ErrorCodeBadRequest = require('../errors/ErrorCodeBadRequest');
 const ErrorCodeConflict = require('../errors/ErrorCodeConflict');
 const ErrorCodeNotFound = require('../errors/ErrorCodeNotFound');
+const ErrorCodeAuth = require('../errors/ErrorCodeAuth');
+
+const { NODE_ENV, JWT_SECRET } = process.env;
 
 const getUsers = (req, res, next) => {
   // User.find({})
@@ -120,11 +123,27 @@ const getCurrentUser = (req, res, next) => {
 const login = (req, res, next) => {
   const { email, password } = req.body;
 
-  return User.findUserByCredentials(email, password)
+  User.findOne({ email })
+    .select('+password')
     .then((user) => {
-      // const token = jwt.sign({ _id: user._id }, 'yandex-praktikum', { expiresIn: '7d' });
-      const token = jwt.sign({ _id: user._id }, `${NODE_ENV === 'production' ? JWT_SECRET : 'yandex-praktikum'}`, { expiresIn: '7d' });
-      res.send({ token });
+      if (!user) {
+        throw new ErrorCodeAuth('Неверные почта или пароль');
+      }
+      return bcrypt.compare(password, user.password).then((matched) => {
+        if (!matched) {
+          return next(
+            new ErrorCodeAuth('Неверные почта или пароль')
+          );
+        }
+        const token = jwt.sign(
+          { _id: user._id },
+          NODE_ENV === 'production' ? JWT_SECRET : 'yandex-praktikum',
+          {
+            expiresIn: '7d',
+          }
+        );
+        return res.send({ token });
+      });
     })
     .catch(next);
 };

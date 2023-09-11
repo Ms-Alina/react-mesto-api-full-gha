@@ -1,53 +1,48 @@
-import { request } from "./request";
-
-// export const BASE_URL = 'https://auth.nomoreparties.co';
-export const BASE_URL = 'https://api.mesto-gallery.student.nomoredomainsicu.ru';
-
-export const register = (password, email) => {
-  return request(`${BASE_URL}/signup`, {
-    method: 'POST',
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      password,
-      email,
-    })
-  })
-}; 
-
-export const login = (password, email) => {
-  return request(`${BASE_URL}/signin`, {
-    method: 'POST',
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      password,
-      email,
-    })
-  })
-};
-
-// export const checkToken = (token) => {
-//   return request(`${BASE_URL}/users/me`, {
-//     method: 'GET',
-//     headers: {
-//       'Accept': 'application/json',
-//       'Content-Type': 'application/json',
-//       'Authorization': `Bearer ${token}`,
-//     }
-//   })
-// } 
-export const checkToken = (jwt) => {
-  return request(`${BASE_URL}/users/me`, {
-    method: 'GET',
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${jwt}`,
+class Api {
+  constructor({ baseUrl }) {
+    this._baseUrl = baseUrl;
+  }
+  
+  _getResponseData(res) {
+    if (res.ok) {
+      return res.json();
     }
-  })
-} 
+    return Promise.reject(`Ошибка: ${res.status}`);
+  }
+
+  register = (email, password) => {
+    return fetch(`${this._baseUrl}/signup`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
+    }).then((response) => {
+      return this.checkResponse(response);
+    });
+  };
+
+  authorize = (email, password) => {
+    return fetch(`${this._baseUrl}/signin`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
+    }).then((response) => this.checkResponse(response));
+  };
+
+  checkToken = (token) => {
+    return fetch(`${this._baseUrl}/users/me`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        authorization: `Bearer ${token}`,
+      },
+    }).then((res) => this.checkResponse(res));
+  };
+}
+
+export const auth = new Api({
+  baseUrl: 'https://api.mesto-gallery.student.nomoredomainsicu.ru',
+});

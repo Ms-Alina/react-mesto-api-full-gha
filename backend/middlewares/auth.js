@@ -14,13 +14,15 @@ module.exports = (req, res, next) => {
   let payload;
 
   try {
-    // payload = jwt.verify(token, 'yandex-praktikum');
-    payload = jwt.verify(token, `${NODE_ENV === 'production' ? JWT_SECRET : 'yandex-praktikum'}`);
-    req.user = payload;
+    payload = jwt.verify(
+      token,
+      NODE_ENV === 'production' ? JWT_SECRET : 'yandex-praktikum'
+    );
   } catch (err) {
-    throw new ErrorCodeAuth('Необходима авторизация');
+    next(new ErrorCodeAuth('Необходима авторизация'));
   }
 
   req.user = payload;
-  next();
+
+  return next();
 };

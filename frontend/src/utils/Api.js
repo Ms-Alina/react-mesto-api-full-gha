@@ -1,17 +1,9 @@
 export default class Api {
-  constructor({
-    baseUrl,
-    headers
-  }) {
+  constructor({ baseUrl, headers }) {
     this._baseUrl = baseUrl;
-    this._userUrl = `${this._baseUrl}/users/me`;
-    this._cardsUrl = `${this._baseUrl}/cards`;
-    this._likesUrl = `${this._baseUrl}/cards/likes`;
-    // this._token = headers['authorization'];
     this._headers = headers;
   }
 
-  // Метод проверки ответа сервера
   _getResponseData(res) {
     if (res.ok) {
       return res.json();
@@ -19,141 +11,61 @@ export default class Api {
     return Promise.reject(`Ошибка: ${res.status}`);
   }
 
-  _getHeaders() {
-    const jwt = localStorage.getItem('jwt');
-    return {
-      'Authorization': `Bearer ${jwt}`,
-      ...this._headers,
-    };
+  getUserData() {
+    return fetch(`${this._baseUrl}/users/me`,
+    { headers: this._headers }).then((res) => this._getResponseData(res));
   }
 
-  // Получем информацию о пользователе с сервера
-  async getUserData() {
-    const res = await fetch(this._userUrl, {
-      // headers: {
-      //   authorization: this._token,
-      // }
-      headers: this._getHeaders(),
-    });
-    return this._getResponseData(res);
+  getInitialCards() {
+    return fetch(`${this._baseUrl}/cards`,
+    { headers: this._headers }).then((res) => this._getResponseData(res));
   }
 
-  // Сохраняем отредактированные данные пользователя на сервере
-  async saveUserChanges({
-    name,
-    about
-  }) {
-    const res = await fetch(this._userUrl, {
+  saveUserChanges(data){
+    return fetch(`${this._baseUrl}/users/me`, {
       method: 'PATCH',
-      // headers: {
-      //   authorization: this._token,
-      //   'Content-Type': 'application/json'
-      // },
-      headers: this._getHeaders(),
       body: JSON.stringify({
-        name: name,
-        about: about,
-      })
-    });
-    return this._getResponseData(res);
+        name: data.name,
+        about: data.about,
+      }),
+      headers: this._headers }).then((res) => this._getResponseData(res));
   }
 
-  // Обновляем аватар пользователя
-  async changedAvatar(src) {
-    const res = await fetch(`${this._userUrl}/avatar`, {
-      method: 'PATCH',
-      // headers: {
-      //   authorization: this._token,
-      //   'Content-Type': 'application/json'
-      // },
-      headers: this._getHeaders(),
-      body: JSON.stringify({
-        avatar: src,
-      })
-    });
-    return this._getResponseData(res);
-  }
-
-  // Получаем карточеки с сервера
-  async getInitialCards() {
-    const res = await fetch(this._cardsUrl, {
-      // headers: {
-      //   authorization: this._token,
-      // }
-      headers: this._getHeaders()
-    });
-    return this._getResponseData(res);
-  }
-
-  // Добавляем новую карточку на сервер
-  async postNewCard({
-    name,
-    link
-  }) {
-    const res = await fetch(this._cardsUrl, {
+  postNewCard(card) {
+    return fetch(`${this._baseUrl}/cards`, {
       method: 'POST',
-      // headers: {
-      //   authorization: this._token,
-      //   'Content-Type': 'application/json'
-      // },
-      headers: this._getHeaders(),
       body: JSON.stringify({
-        name: name,
-        link: link,
-      })
-    });
-    return this._getResponseData(res);
+        name: card.name,
+        link: card.link,
+      }),
+      headers: this._headers }).then((res) => this._getResponseData(res));
   }
 
-  // Удаляем карточки пользователя с сервера
   deleteCard(cardId) {
-    return fetch(`${this._cardsUrl}/${cardId}`, {
-        method: 'DELETE',
-        // headers: {
-        //   authorization: this._token,
-        // }
-        headers: this._getHeaders()
-      })
-      .then(res => {
-        return this._getResponseData(res);
-      })
+    return fetch(`${this._url}/cards/${cardId}`, {
+      method: 'DELETE',
+      headers: this._headers }).then((res) => this._getResponseData(res));
   }
 
-  // Ставим лайк карточке
+  changedAvatar(data) {
+    return fetch(`${this._url}/users/me/avatar`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        avatar: data.avatar,
+      }),
+      headers: this._headers }).then((res) => this._checkResponse(res));
+  }
+
   likedCard(cardId) {
-    return fetch(`${this._likesUrl}/${cardId}`, {
+    return fetch(`${this._baseUrl}/cards/${cardId}/likes`, {
         method: 'PUT',
-        // headers: {
-        //   authorization: this._token,
-        // }
-        headers: this._getHeaders()
-      })
-      .then(res => {
-        return this._getResponseData(res);
-      })
+        headers: this._headers,
+      }).then((res) => this._getResponseData(res));
   }
 
-  // Удаляем лайк с карточки
   dislikedCard(cardId) {
-    return fetch(`${this._likesUrl}/${cardId}`, {
-        method: 'DELETE',
-        // headers: {
-        //   authorization: this._token,
-        // }
-        headers: this._getHeaders()
-      })
-      .then(res => {
-        return this._getResponseData(res);
-      })
+    return fetch(`${this._baseUrl}/cards/${cardId}/likes`, {
+      method: 'DELETE',
+      headers: this._headers }).then((res) => this._getResponseData(res));
   }
 }
-
-// Создаем экземпляр класса Api
-export const api = new Api({
-  // baseUrl: 'https://mesto.nomoreparties.co/v1/cohort-68',
-  baseUrl: 'https://api.mesto-gallery.student.nomoredomainsicu.ru',
-  headers: {
-    // authorization: '04191f74-b685-4000-9654-e8e43ee7e193',
-    'Content-Type': 'application/json'
-  }
-});
