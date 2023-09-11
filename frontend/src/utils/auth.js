@@ -18,7 +18,7 @@ class Api {
       },
       body: JSON.stringify({ email, password }),
     }).then((response) => {
-      return this.checkResponse(response);
+      return this._getResponseData(response);
     });
   };
 
@@ -29,7 +29,7 @@ class Api {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ email, password }),
-    }).then((response) => this.checkResponse(response));
+    }).then((response) => this._getResponseData(response));
   };
 
   checkToken = (token) => {
@@ -39,7 +39,7 @@ class Api {
         'Content-Type': 'application/json',
         authorization: `Bearer ${token}`,
       },
-    }).then((res) => this.checkResponse(res));
+    }).then((res) => this._getResponseData(res));
   };
 }
 
