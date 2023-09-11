@@ -69,3 +69,11 @@ export default class Api {
       headers: this._headers }).then((res) => this._getResponseData(res));
   }
 }
+
+// const api = new Api({
+//   url: 'https://api.mesto-gallery.student.nomoredomainsicu.ru',
+//   headers: {
+//     'Content-Type': 'application/json',
+//     authorization: `Bearer ${localStorage.getItem('jwt')}`,
+//   },
+// })

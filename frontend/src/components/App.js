@@ -7,7 +7,8 @@ import Footer from './Footer';
 
 import ImagePopup from './ImagePopup';
 
-import { api } from '../utils/Api.js';
+import Api from '../utils/Api.js';
+import { auth } from '../utils/auth.js';
 import AddPlacePopup from './AddPlacePopup';
 import EditAvatarPopup from './EditAvatarPopup';
 import EditProfilePopup from './EditProfilePopup';
@@ -19,7 +20,7 @@ import Login from './Login';
 import ProtectedRoute from './ProtectedRoute';
 import InfoTooltip from './InfoTooltip';
 
-import * as auth from '../utils/auth';
+/* import * as auth from '../utils/auth'; */
 
 function App() {
   const [currentUser, setCurrentUser] = useState({});
@@ -44,6 +45,14 @@ function App() {
   const [email, setEmail] = useState('');
 
   const history = useHistory();
+
+  const api = new Api({
+    url: 'https://api.mesto-gallery.student.nomoredomainsicu.ru',
+    headers: {
+      'Content-Type': 'application/json',
+      authorization: `Bearer ${localStorage.getItem('jwt')}`,
+    },
+  })
 
   useEffect(() => {
     Promise.all([api.getUserData(), api.getInitialCards()])
@@ -88,6 +97,7 @@ function App() {
   //       });
   //   }
   // }, [history]);
+
   useEffect(() => {
     const jwt = localStorage.getItem('jwt');
     if(jwt){
