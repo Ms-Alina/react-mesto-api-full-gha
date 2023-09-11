@@ -136,9 +136,7 @@ const login = (req, res, next) => {
         const token = jwt.sign(
           { _id: user._id },
           NODE_ENV === 'production' ? JWT_SECRET : 'yandex-praktikum',
-          {
-            expiresIn: '7d'
-          }
+          { expiresIn: '7d' },
         );
         return res.send({ token });
       });

@@ -16,7 +16,7 @@ module.exports = (req, res, next) => {
   try {
     payload = jwt.verify(
       token,
-      NODE_ENV === 'production' ? JWT_SECRET : 'yandex-praktikum'
+      NODE_ENV === 'production' ? JWT_SECRET : 'yandex-praktikum',
     );
   } catch (err) {
     next(new ErrorCodeAuth('Необходима авторизация'));
