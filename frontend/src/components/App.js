@@ -43,6 +43,7 @@ function App() {
   // Состояние авторизации пользователя и его данных
   const [loggedIn, setLoggedIn] = useState(false);
   const [email, setEmail] = useState('');
+/*   const [isLoading, setIsLoading] = useState(false); */
 
   const history = useHistory();
 
@@ -50,11 +51,12 @@ function App() {
     url: 'https://api.mesto-gallery.student.nomoredomainsicu.ru',
     headers: {
       'Content-Type': 'application/json',
-      authorization: `Bearer ${localStorage.getItem('jwt')}`,
+       authorization: `Bearer ${localStorage.getItem('jwt')}`,
     },
   })
 
   useEffect(() => {
+    loggedIn &&
     Promise.all([api.getUserData(), api.getInitialCards()])
       .then(([user, cards]) => {
         setCurrentUser(user);
@@ -63,7 +65,7 @@ function App() {
       .catch((err) => {
         console.error(err);
       });
-    }, []);
+    }, [loggedIn]);
 
   const isOpen = isAddPlacePopupOpen || isEditAvatarPopupOpen || isEditProfilePopupOpen || isProfilePopupOpened || selectedCard || isInfoTooltip;
 
