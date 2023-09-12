@@ -30,12 +30,12 @@ function App() {
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false);
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = useState(false);
   const [isProfilePopupOpened, setIsProfilePopupOpened] = useState(false);
-  const [isInfoTooltip, setInfoTooltip] = useState({isOpen: false, successful: false});
+  const [isInfoTooltip, setInfoTooltip] = useState({ isOpen: false, successful: false });
 
   // Состояние карточек
   const [selectedCard, setSelectedCard] = useState(null);
   const [cards, setCards] = useState([]);
-  const [selectedCardDeleteProve, setSelectedCardDeleteProve] = useState({isOpen: false, card: {}});
+  const [selectedCardDeleteProve, setSelectedCardDeleteProve] = useState({ isOpen: false, card: {} });
 
   // Состояние обработки 
   const [renderSaving, setRenderSaving] = useState(false);
@@ -43,7 +43,9 @@ function App() {
   // Состояние авторизации пользователя и его данных
   const [loggedIn, setLoggedIn] = useState(false);
   const [email, setEmail] = useState('');
-/*   const [isLoading, setIsLoading] = useState(false); */
+
+  // Что добавлено мной
+  const [dataLoadingError, setDataLoadingError] = useState('');
 
   const history = useHistory();
 
@@ -51,21 +53,80 @@ function App() {
     url: 'https://api.mesto-gallery.student.nomoredomainsicu.ru',
     headers: {
       'Content-Type': 'application/json',
-       authorization: `Bearer ${localStorage.getItem('jwt')}`,
+      authorization: `Bearer ${localStorage.getItem('jwt')}`,
     },
   })
 
   useEffect(() => {
+    const jwt = localStorage.getItem('jwt');
+    if (jwt) {
+      auth.checkToken(jwt)
+        .then(data => {
+          if (data) {
+            setEmail(data.email);
+            handleLoggedIn();
+            history.push('/');
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    }
+  }, []);
+
+  const handleSignOut = () => {
+    setLoggedIn(false);
+    setEmail('');
+    localStorage.removeItem('jwt');
+    // history.push('/signin');
+  };
+
+  useEffect(() => {
     loggedIn &&
-    Promise.all([api.getUserData(), api.getInitialCards()])
-      .then(([user, cards]) => {
-        setCurrentUser(user);
-        setCards(cards);
+      Promise.all([api.getUserData(), api.getInitialCards()])
+        .then(([user, cards]) => {
+          setCurrentUser(user);
+          setCards(cards.reverse());
+        })
+        .catch((err) => {
+          setDataLoadingError(`Something goes wrong... (${err})`);
+        });
+  }, [loggedIn]);
+
+  const handleRegister = (values) => {
+    if (!values.email || !values.email) {
+      return;
+    }
+    auth
+      .register(values.email, values.password)
+      .then((res) => {
+        handleInfoTooltip((prev) => !prev);
+        history.push('/signin');
       })
       .catch((err) => {
-        console.error(err);
+        handleInfoTooltip((prev) => !prev);
+        setDataLoadingError(`Something goes wrong... (${err})`);
       });
-    }, [loggedIn]);
+  };
+
+  const handleLogin = (values) => {
+    if (!values.email || !values.password) {
+      return;
+    }
+    auth
+      .authorize(values.email, values.password)
+      .then((data) => {
+        if (data.token) {
+          localStorage.setItem('jwt', data.token);
+          setEmail(values.email);
+          setLoggedIn(true);
+        }
+      })
+      .catch((err) => {
+        handleInfoTooltip((prev) => !prev);
+        setDataLoadingError(`Something goes wrong... (${err})`);
+      });
+  };
 
   const isOpen = isAddPlacePopupOpen || isEditAvatarPopupOpen || isEditProfilePopupOpen || isProfilePopupOpened || selectedCard || isInfoTooltip;
 
@@ -83,41 +144,6 @@ function App() {
     }
   }, [isOpen]);
 
-  // useEffect(() => {
-  //   const token = localStorage.getItem('token');
-  //   if(token){
-  //     auth.checkToken(token)
-  //       .then(data => {
-  //         if(data){
-  //           setEmail(data.data.email);
-  //           handleLoggedIn();
-  //           history.push('/');
-  //         }
-  //       })
-  //       .catch((err) => {
-  //         console.error(err);
-  //       });
-  //   }
-  // }, [history]);
-  //
-
-  useEffect(() => {
-    const jwt = localStorage.getItem('jwt');
-    if(jwt){
-      auth.checkToken(jwt)
-        .then(data => {
-          if(data){
-            setEmail(data.data.email);
-            handleLoggedIn();
-            history.push('/');
-          }
-        })
-        .catch((err) => {
-          console.error(err);
-        });
-    }
-  }, [history]);
-
   function handleUpdateUser(data) {
     setRenderSaving(true);
     api.saveUserChanges(data)
@@ -131,12 +157,12 @@ function App() {
       .finally(() => {
         setRenderSaving(false);
       });
-    }
+  }
 
   function handleAddPlaceSubmit(data) {
     setRenderSaving(true);
     api.postNewCard(data)
-        .then(newCard => {
+      .then(newCard => {
         setCards([newCard, ...cards]);
         closeAllPopups();
       })
@@ -146,7 +172,7 @@ function App() {
       .finally(() => {
         setRenderSaving(false);
       });
-    }
+  }
 
   function handleAvatarUpdate(data) {
     setRenderSaving(true);
@@ -161,7 +187,7 @@ function App() {
       .finally(() => {
         setRenderSaving(false);
       });
-    }
+  }
 
   function handleCardLike(card) {
     const isLiked = card.likes.some((i) => i._id === currentUser._id);
@@ -182,7 +208,7 @@ function App() {
         .catch((err) => {
           console.error(err);
         });
-      }
+    }
   }
 
   function handleCardDelete(card) {
@@ -198,68 +224,8 @@ function App() {
       .finally(() => {
         setRenderSaving(false);
       });
-    }
-
-    // Обработчик регистрации
-    function handleRegister(password, email){
-      auth.register(password, email)
-        .then(data => {
-          if(data){
-            handleInfoTooltip(true);
-            history.push('/signin');
-          }
-        })
-        .catch(err => {
-          console.log(err);
-          handleInfoTooltip(false);
-        })
-    }
-  
-    // Обработчик авторизации
-    // function handleLogin(password, email) {
-    //   auth.login(password, email)
-    //     .then(data => {
-    //       if(data.token){
-    //         setEmail(email);
-    //         handleLoggedIn();
-    //         history.push('/');
-    //         localStorage.setItem('token', data.token);
-    //       }
-    //     })
-    //     .catch(err => {
-    //       handleInfoTooltip(false);
-    //       console.log(err);
-    //     }) 
-    // }
-    function handleLogin(password, email) {
-      auth.login(password, email)
-        .then(data => {
-          if(data.token){
-            setEmail(email);
-            handleLoggedIn();
-            history.push('/');
-            localStorage.setItem('jwt', data.token);
-          }
-        })
-        .catch(err => {
-          handleInfoTooltip(false);
-          console.log(err);
-        }) 
-    }
-
-  // Обработчик выхода
-  // function handleSignOut() {
-  //   localStorage.removeItem('token');
-  //   setLoggedIn(false);
-  //   setEmail('');
-  //   history.push('/signin');
-  // }
-  function handleSignOut() {
-    localStorage.removeItem('jwt');
-    setLoggedIn(false);
-    setEmail('');
-    history.push('/signin');
   }
+
 
   function handleEditAvatarClick() {
     setIsEditAvatarPopupOpen(true);
@@ -278,7 +244,7 @@ function App() {
   }
 
   function handleDeleteProve(card) {
-    setSelectedCardDeleteProve({...setSelectedCardDeleteProve, isOpen: true, card: card});
+    setSelectedCardDeleteProve({ ...setSelectedCardDeleteProve, isOpen: true, card: card });
   }
 
   function handlePopupCloseClick(evt) {
@@ -293,7 +259,7 @@ function App() {
     setIsAddPlacePopupOpen(false);
     setSelectedCard(null);
     setIsProfilePopupOpened(false);
-    setSelectedCardDeleteProve({...setSelectedCardDeleteProve, isOpen: false });
+    setSelectedCardDeleteProve({ ...setSelectedCardDeleteProve, isOpen: false });
     setInfoTooltip(false);
   }
 
@@ -302,7 +268,7 @@ function App() {
   }
 
   function handleInfoTooltip(result) {
-    setInfoTooltip({...isInfoTooltip, isOpen: true, successful: result});
+    setInfoTooltip({ ...isInfoTooltip, isOpen: true, successful: result });
   }
 
   return (
@@ -315,21 +281,22 @@ function App() {
             exact path='/'
             loggedIn={loggedIn}
             component={Main}
-            onEditProfile={handleEditProfileClick} 
-            onAddPlace={handleAddPlaceClick} 
+            onEditProfile={handleEditProfileClick}
+            onAddPlace={handleAddPlaceClick}
             onEditAvatar={handleEditAvatarClick}
-            onCardClick={handleImagePopupOpen} 
-            cards={cards} 
-            onCardLike={handleCardLike} 
+            onCardClick={handleImagePopupOpen}
+            cards={cards}
+            onCardLike={handleCardLike}
             onDeleteProve={handleDeleteProve}
+            dataLoadingError={dataLoadingError}
           />
 
-          <Route  path="/signin">
-            <Login onLogin={handleLogin}/>
+          <Route path="/signin">
+            <Login onLogin={handleLogin} />
           </Route>
 
-          <Route  path="/signup">
-            <Register onRegister={handleRegister}/>
+          <Route path="/signup">
+            <Register onRegister={handleRegister} />
           </Route>
 
           <Route>
@@ -337,53 +304,53 @@ function App() {
               <Redirect to="/" />
             ) : (
               <Redirect to="/signin" />
-            )} 
+            )}
           </Route>
         </Switch>
 
         <Footer />
 
-        <ImagePopup 
-          card={selectedCard} 
+        <ImagePopup
+          card={selectedCard}
           onClose={closeAllPopups}
-          onCloseClick={handlePopupCloseClick} 
+          onCloseClick={handlePopupCloseClick}
         />
 
-        <EditProfilePopup 
-          isOpen={isEditProfilePopupOpen} 
-          onClose={closeAllPopups} 
-          onCloseClick={handlePopupCloseClick} 
+        <EditProfilePopup
+          isOpen={isEditProfilePopupOpen}
+          onClose={closeAllPopups}
+          onCloseClick={handlePopupCloseClick}
           onSubmit={handleUpdateUser}
           isRender={renderSaving}
         />
 
-        <AddPlacePopup 
-          isOpen={isAddPlacePopupOpen} 
-          onClose={closeAllPopups} 
-          onCloseClick={handlePopupCloseClick} 
+        <AddPlacePopup
+          isOpen={isAddPlacePopupOpen}
+          onClose={closeAllPopups}
+          onCloseClick={handlePopupCloseClick}
           onSubmit={handleAddPlaceSubmit}
           isRender={renderSaving}
         />
 
-        <EditAvatarPopup 
-          isOpen={isEditAvatarPopupOpen} 
-          onClose={closeAllPopups} 
-          onCloseClick={handlePopupCloseClick} 
+        <EditAvatarPopup
+          isOpen={isEditAvatarPopupOpen}
+          onClose={closeAllPopups}
+          onCloseClick={handlePopupCloseClick}
           onSubmit={handleAvatarUpdate}
           isRender={renderSaving}
         />
 
-        <DeleteProvePopup 
+        <DeleteProvePopup
           deleteCard={selectedCardDeleteProve}
-          onClose={closeAllPopups} 
-          onCloseClick={handlePopupCloseClick} 
+          onClose={closeAllPopups}
+          onCloseClick={handlePopupCloseClick}
           onDeleteCard={handleCardDelete}
           isRender={renderSaving}
         />
 
-        <InfoTooltip 
-          result={isInfoTooltip} 
-          onClose={closeAllPopups} 
+        <InfoTooltip
+          result={isInfoTooltip}
+          onClose={closeAllPopups}
           onCloseClick={handlePopupCloseClick}
         />
       </div>
