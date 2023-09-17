@@ -22,6 +22,9 @@ function AddPlacePopup(props) {
       name: name,
       link: link
     });
+
+    // 
+    // props.onClose();
   }
 
   React.useEffect(() => {
@@ -31,44 +34,44 @@ function AddPlacePopup(props) {
     }
   }, [props.isOpen]);
 
-  return(
+  return (
     <PopupWithForm
       isOpen={props.isOpen}
       onCloseClick={props.onCloseClick}
       onClose={props.onClose}
       onSubmit={handleSubmit}
-      title='Новое место' 
-      name='add-card' 
-      formName='formAddCards'  
+      title='Новое место'
+      name='add-card'
+      formName='formAddCards'
       //btnName='Создать' 
-      btnName={props.isRender ? 'Сохранение...' :'Создать'}
+      btnName={props.isRender ? 'Сохранение...' : 'Создать'}
       btnRole=''
       typeContainer=''
     >
-      <input 
-        id="nameCard-input" 
-        type="text" 
-        name="name" 
-        autoComplete="off" 
-        placeholder="Название" 
-        required 
-        minLength="2" 
-        maxLength="30" 
-        className="popup__input popup__input_info_heading-card" 
-        value={name} 
-        onChange={handleAddName} 
+      <input
+        id="nameCard-input"
+        type="text"
+        name="name"
+        autoComplete="off"
+        placeholder="Название"
+        required
+        minLength="2"
+        maxLength="30"
+        className="popup__input popup__input_info_heading-card"
+        value={name}
+        onChange={handleAddName}
       />
       <span className="popup__input-error popup__input-error-place nameCard-input-error"></span>
-      <input 
-        id="callingCard-input" 
-        type="url" 
-        name="link" 
-        autoComplete="off" 
-        placeholder="Ссылка на картинку" 
-        required 
+      <input
+        id="callingCard-input"
+        type="url"
+        name="link"
+        autoComplete="off"
+        placeholder="Ссылка на картинку"
+        required
         className="popup__input popup__input_info_url-img"
-        value={link} 
-        onChange={handleAddLink} 
+        value={link}
+        onChange={handleAddLink}
       />
       <span className="popup__input-error popup__input-error-place callingCard-input-error"></span>
     </PopupWithForm>

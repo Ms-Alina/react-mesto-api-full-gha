@@ -1,48 +1,49 @@
 class Api {
-  constructor({ baseUrl }) {
-    this._baseUrl = baseUrl;
+  constructor({ url }) {
+    this._url = url;
   }
-  
-  _getResponseData(res) {
+
+  checkResponse = (res) => {
     if (res.ok) {
       return res.json();
     }
     return Promise.reject(`Ошибка: ${res.status}`);
-  }
+  };
 
   register = (email, password) => {
-    return fetch(`${this._baseUrl}/signup`, {
+    return fetch(`${this._url}/signup`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ email, password }),
     }).then((response) => {
-      return this._getResponseData(response);
+      return this.checkResponse(response);
     });
   };
 
-  authorize = (email, password) => {
-    return fetch(`${this._baseUrl}/signin`, {
+  login = (email, password) => {
+    return fetch(`${this._url}/signin`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ email, password }),
-    }).then((response) => this._getResponseData(response));
+    }).then((response) => this.checkResponse(response));
   };
 
   checkToken = (token) => {
-    return fetch(`${this._baseUrl}/users/me`, {
+    return fetch(`${this._url}/users/me`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
         authorization: `Bearer ${token}`,
       },
-    }).then((res) => this._getResponseData(res));
+    }).then((res) => this.checkResponse(res));
   };
 }
 
 export const auth = new Api({
-  baseUrl: 'https://api.mesto-gallery.student.nomoredomainsicu.ru',
+  // url: 'http://localhost:3000',
+  url: 'https://api.mesto-gallery.student.nomoredomainsicu.ru',
 });

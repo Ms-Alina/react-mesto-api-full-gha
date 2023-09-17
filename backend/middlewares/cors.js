@@ -1,5 +1,7 @@
 const allowedCors = [
   'http://127.0.0.1:3000',
+  'http://localhost:3000',
+  'http://localhost:3001',
   'http://mesto-gallery.students.nomoredomainsicu.ru',
   'https://mesto-gallery.students.nomoredomainsicu.ru',
   'http://api.mesto-gallery.student.nomoredomainsicu.ru',

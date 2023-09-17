@@ -18,16 +18,16 @@ function Register({ onRegister }) {
 
   function handleSubmit(evt) {
     evt.preventDefault();
-    onRegister(password, email);
+    onRegister(email, password);
   }
 
   return (
     <section className="entry" >
       <div className="entry__container">
         <h3 className="entry__heading">Регистрация</h3>
-        <form 
+        <form
           className="entry__form"
-          name="entry__form-register" 
+          name="entry__form-register"
           onSubmit={handleSubmit}
         >
           <input
@@ -41,7 +41,7 @@ function Register({ onRegister }) {
             maxLength="40"
             className="entry__input"
             value={email}
-            onChange={handleChangeEmail} 
+            onChange={handleChangeEmail}
           />
 
           <input

@@ -2,122 +2,111 @@ require('dotenv').config();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
-const ErrorCodeBadRequest = require('../errors/ErrorCodeBadRequest');
-const ErrorCodeConflict = require('../errors/ErrorCodeConflict');
-const ErrorCodeNotFound = require('../errors/ErrorCodeNotFound');
-const ErrorCodeAuth = require('../errors/ErrorCodeAuth');
+const customError = require('../errors/customError');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 
+const checkUser = (user, res) => {
+  if (!user) {
+    throw new customError.ErrorCodeNotFound('Нет пользователя с таким id');
+  }
+  return res.status(200).send(user);
+};
+
 const getUsers = (req, res, next) => {
-  // User.find({})
-  //   .then((users) => res.status(200).send(users))
-  //   .catch(next);
-  const { userList } = {};
-  User.find(userList)
-    .then((users) => res.status(200).send(users))
+  User.find({})
+    .then((users) => res.status(200).send({ data: users }))
     .catch(next);
 };
 
 const findUser = (req, res, next) => {
   const { userId } = req.params;
 
-  return User.findById(userId)
-    .orFail(() => {
-      throw new ErrorCodeNotFound('Пользователь по указанному _id не найден');
-    })
-    .then((user) => res.status(200).send(user))
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        return next(new ErrorCodeBadRequest('Переданы некорректные данные'));
-      }
-      if (err.message === 'NotFound') {
-        return next(new ErrorCodeNotFound('Пользователь по указанному _id не найден'));
-      }
-      return next(err);
-    });
+  User.findById(userId)
+    .then((user) => checkUser(user, res))
+    .catch(next);
 };
 
 const createUser = (req, res, next) => {
-  const {
-    name,
-    about,
-    avatar,
-    email,
-    password,
-  } = req.body;
-
-  bcrypt.hash(password, 10)
-    .then((hash) => User.create({
-      name,
-      about,
-      avatar,
-      email,
-      password: hash,
-    }))
-    .then(() => {
-      res.status(201).send({
-        data: {
-          name, about, avatar, email,
-        },
-      });
+  bcrypt
+    .hash(req.body.password, 10)
+    .then((hash) => {
+      User.create({
+        email: req.body.email,
+        password: hash,
+        name: req.body.name,
+        about: req.body.about,
+        avatar: req.body.avatar,
+      })
+        .then((newUser) => {
+          res.status(201).send({
+            email: newUser.email,
+            name: newUser.name,
+            about: newUser.about,
+            avatar: newUser.avatar,
+          });
+        })
+        .catch((error) => {
+          if (error.code === 11000) {
+            next(new customError.ErrorCodeConflict('Этот email уже зарегистрирован'));
+          } else if (error.name === 'ValidationError') {
+            next(new customError.ErrorCodeBadRequest('Некорректные данные при создании нового пользователя'));
+          } else {
+            next(error);
+          }
+        });
     })
-    .catch((err) => {
-      if (err.code === 11000) {
-        return next(new ErrorCodeConflict('Этот email уже зарегистрирован'));
-      }
-      return next(err);
-    });
+    .catch(next);
 };
 
 const updateUserProfile = (req, res, next) => {
+  const owner = req.user._id;
   const { name, about } = req.body;
 
-  return User.findByIdAndUpdate(
-    req.user._id,
+  User.findByIdAndUpdate(
+    owner,
     { name, about },
     { new: true, runValidators: true },
-  ).orFail(() => {
-    throw new ErrorCodeNotFound('Пользователь с указанным _id не найден');
-  })
-    .then((user) => res.status(200).send(user))
-    .catch((err) => {
-      if (err.name === 'ValidationError' || err.name === 'CastError') {
-        return next(new ErrorCodeBadRequest('Переданы некорректные данные при обновлении профиля'));
+  )
+    .then((user) => checkUser(user, res))
+    .catch((error) => {
+      if (error.name === 'ValidationError') {
+        next(new customError.ErrorCodeBadRequest('Переданы некорректные данные при обновлении профиля'));
+      } else {
+        next(error);
       }
-      return next(err);
     });
 };
 
 const updateUserAvatar = (req, res, next) => {
-  const { avatar } = req.body;
+  const owner = req.user._id;
+  const avatar = req.body;
 
-  return User.findByIdAndUpdate(
-    req.user._id,
-    { avatar },
+  User.findByIdAndUpdate(
+    owner,
+    avatar,
     { new: true, runValidators: true },
-  ).orFail(() => {
-    throw new ErrorCodeNotFound('Пользователь с указанным _id не найден');
-  })
-    .then((user) => res.status(200).send(user))
-    .catch((err) => {
-      if (err.name === 'ValidationError' || err.name === 'CastError') {
-        return next(new ErrorCodeBadRequest('Переданы некорректные данные при обновлении аватара'));
+  )
+    .then((user) => checkUser(user, res))
+    .catch((error) => {
+      if (error.name === 'ValidationError') {
+        next(new customError.ErrorCodeBadRequest('Переданы некорректные данные при обновлении аватара'));
+      } else {
+        next(error);
       }
-      return next(err);
     });
 };
 
 const getCurrentUser = (req, res, next) => {
-  const userId = req.user._id;
-  User.findById(userId)
-    .orFail(() => {
-      throw new ErrorCodeNotFound('Пользователь с таким id не найден');
-    })
-    .then((user) => {
-      res.status(200).send({ data: user });
-    })
-    .catch(next);
+  User.findById(req.user._id)
+    .then((user) => res.status(200).send(user))
+    .catch((error) => {
+      if (error.name === 'ValidationError') {
+        next(new customError.ErrorCodeBadRequest('Пользователь с таким id не найден'));
+      } else {
+        next(error);
+      }
+    });
 };
 
 const login = (req, res, next) => {
@@ -127,11 +116,11 @@ const login = (req, res, next) => {
     .select('+password')
     .then((user) => {
       if (!user) {
-        throw new ErrorCodeAuth('Неверные почта или пароль');
+        throw new customError.ErrorCodeAuth('Неверные почта или пароль');
       }
       return bcrypt.compare(password, user.password).then((matched) => {
         if (!matched) {
-          return next(new ErrorCodeAuth('Неверные почта или пароль'));
+          return next(new customError.ErrorCodeAuth('Неверные почта или пароль'));
         }
         const token = jwt.sign(
           { _id: user._id },

@@ -17,18 +17,18 @@ function Login({ onLogin }) {
 
   function handleSubmit(evt) {
     evt.preventDefault();
-    if (!email || !password){
+    if (!email || !password) {
       return;
     }
-    onLogin(password, email);
+    onLogin(email, password);
   }
 
   return (
     <div className="entry">
       <div className="entry__container">
         <h2 className="entry__heading">Вход</h2>
-        <form 
-          className="entry__form" 
+        <form
+          className="entry__form"
           name="entry-form-login "
           onSubmit={handleSubmit}
         >
@@ -63,7 +63,6 @@ function Login({ onLogin }) {
       </div>
     </div>
   )
-
 }
 
 export default Login;

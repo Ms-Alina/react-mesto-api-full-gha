@@ -1,3 +1,4 @@
+require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const ErrorCodeAuth = require('../errors/ErrorCodeAuth');
 
@@ -14,15 +15,13 @@ module.exports = (req, res, next) => {
   let payload;
 
   try {
-    payload = jwt.verify(
-      token,
-      NODE_ENV === 'production' ? JWT_SECRET : 'yandex-praktikum',
-    );
+    payload = jwt.verify(token, NODE_ENV === 'production' ? JWT_SECRET : 'yandex-praktikum');
+    req.user = payload;
   } catch (err) {
     next(new ErrorCodeAuth('Необходима авторизация'));
   }
 
-  req.user = payload;
+  // req.user = payload;
 
   return next();
 };
