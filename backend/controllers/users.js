@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const customError = require('../errors/customError');
 
-const { NODE_ENV, PROD_KEY, DEV_KEY } = process.env;
+const { NODE_ENV, PROD_KEY = 'prod-key', DEV_KEY = 'dev-key' } = process.env;
 
 const checkUser = (user, res) => {
   if (!user) {

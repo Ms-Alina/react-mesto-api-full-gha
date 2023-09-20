@@ -2,7 +2,7 @@ require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const ErrorCodeAuth = require('../errors/ErrorCodeAuth');
 
-const { NODE_ENV, PROD_KEY, DEV_KEY } = process.env;
+const { NODE_ENV, PROD_KEY = 'prod-key', DEV_KEY = 'dev-key' } = process.env;
 
 module.exports = (req, res, next) => {
   const { authorization } = req.headers;
