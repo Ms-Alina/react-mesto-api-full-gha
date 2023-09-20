@@ -105,14 +105,10 @@ function App() {
     }
     auth.register(email, password)
       .then((res) => {
-        // setErr(false);
-        // setInfoTooltip((prev) => !prev);
         handleInfoTooltip(true);
         history.push('/signin', { replace: true });
       })
       .catch((err) => {
-        // setErr(true);
-        // setInfoTooltip((prev) => !prev);
         handleInfoTooltip(false);
         console.log(err);
       });

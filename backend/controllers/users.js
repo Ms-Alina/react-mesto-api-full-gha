@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const customError = require('../errors/customError');
 
-const { NODE_ENV, JWT_SECRET } = process.env;
+const { NODE_ENV, PROD_KEY, DEV_KEY } = process.env;
 
 const checkUser = (user, res) => {
   if (!user) {
@@ -49,11 +49,8 @@ const createUser = (req, res, next) => {
         .catch((error) => {
           if (error.code === 11000) {
             next(new customError.ErrorCodeConflict('Этот email уже зарегистрирован'));
-          } else if (error.name === 'ValidationError') {
-            next(new customError.ErrorCodeBadRequest('Некорректные данные при создании нового пользователя'));
-          } else {
-            next(error);
           }
+          next(error);
         });
     })
     .catch(next);
@@ -99,14 +96,11 @@ const updateUserAvatar = (req, res, next) => {
 
 const getCurrentUser = (req, res, next) => {
   User.findById(req.user._id)
+    .orFail(() => {
+      throw new customError.ErrorCodeNotFound('Пользователь с таким id не найден');
+    })
     .then((user) => res.status(200).send(user))
-    .catch((error) => {
-      if (error.name === 'ValidationError') {
-        next(new customError.ErrorCodeBadRequest('Пользователь с таким id не найден'));
-      } else {
-        next(error);
-      }
-    });
+    .catch(next);
 };
 
 const login = (req, res, next) => {
@@ -124,7 +118,7 @@ const login = (req, res, next) => {
         }
         const token = jwt.sign(
           { _id: user._id },
-          NODE_ENV === 'production' ? JWT_SECRET : 'yandex-praktikum',
+          NODE_ENV === 'production' ? PROD_KEY : DEV_KEY,
           { expiresIn: '7d' },
         );
         return res.send({ token });

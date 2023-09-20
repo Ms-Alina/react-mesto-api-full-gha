@@ -32,24 +32,15 @@ const createCard = (req, res, next) => {
 const deleteCard = (req, res, next) => {
   const { cardId } = req.params;
 
-  // Card.deleteOne({ _id: cardId })
-  //   .then((card) => {
-  //     if (card.deletedCount === 0) {
-  //       throw new customError.ErrorCodeNotFound('Карточка с указанным_idне найдена');
-  //     }
-  //     return res.status(200).send({ message: 'Карточка удалена' });
-  //   })
-  //   .catch(next);
   return Card.findById(cardId)
     .orFail(() => {
       throw new customError.ErrorCodeNotFound('Карточка с указанным _id не найдена');
     })
     .then((card) => {
       if (card.owner.toString() === req.user._id) {
-        Card.findByIdAndRemove(cardId).then(() => res.status(200).send(card));
-      } else {
-        throw new customError.ErrorCodeBanned('В доступе отказано');
+        return Card.findByIdAndRemove(cardId).then(() => res.status(200).send(card));
       }
+      return next(new customError.ErrorCodeBanned('В доступе отказано'));
     })
     .catch(next);
 };
@@ -61,7 +52,7 @@ const likeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     cardId,
     { $addToSet: { likes: owner } },
-    { new: true, runValidators: true },
+    { new: true },
   )
     .populate(['owner', 'likes'])
     .then((card) => checkCard(card, res))
@@ -75,7 +66,7 @@ const dislikeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     cardId,
     { $pull: { likes: owner } },
-    { new: true, runValidators: true },
+    { new: true },
   )
     .populate(['owner', 'likes'])
     .then((card) => checkCard(card, res))
